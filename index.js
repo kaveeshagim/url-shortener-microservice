@@ -30,13 +30,20 @@ let counter = 1;
 
 app.post("/api/shorturl", (req, res) => {
   const originalUrl = req.body.url;
+  const parsedUrl = urlParser.parse(originalUrl);
+
+  if (
+    !parsedUrl.protocol ||
+    !/^https?:$/.test(parsedUrl.protocol) ||
+    !parsedUrl.hostname
+  ) {
+    return res.json({ error: "invalid url" });
+  }
 
   try {
-    const hostname = urlParser.parse(originalUrl).hostname;
-
-    dns.lookup(hostname, (err) => {
+    dns.lookup(parsedUrl.hostname, (err) => {
       if (err) {
-        return res.status(400).json({ error: "Invalid URL" });
+        return res.status(400).json({ error: "invalid url" });
       }
 
       const shortUrl = counter++;
@@ -44,7 +51,7 @@ app.post("/api/shorturl", (req, res) => {
       res.json({ original_url: originalUrl, short_url: shortUrl });
     });
   } catch (err) {
-    res.json({ error: "Invalid URL" });
+    res.json({ error: "invalid url" });
   }
 });
 
