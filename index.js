@@ -28,7 +28,7 @@ app.get("/api/hello", function (req, res) {
 let urlDatabase = [];
 let counter = 1;
 
-app.get("/api/shorturl", function (req, res) {
+app.post("/api/shorturl", (req, res) => {
   const originalUrl = req.body.url;
 
   try {
